@@ -1,22 +1,22 @@
 #!/bin/bash
 
-# Prompt for the username
-read -p "Enter your username: " USERNAME
+# Set the username
+USERNAME="esteban"
 USER_HOME="/home/$USERNAME"
 
 # Ensure the script is executed with root privileges
-if [ "$(id -u)" -ne 0 ]; then
+if [ "$(id -u)" -ne 0; then
     echo "This script must be run as root."
     exit 1
 fi
 
 echo "Installing MicroK8s from Snap..."
-sudo snap install microk8s --classic
+snap install microk8s --classic
 
 echo "Adding $USERNAME to the microk8s group..."
-sudo usermod -a -G microk8s $USERNAME
-sudo mkdir -p $USER_HOME/.kube
-sudo chown -f -R $USERNAME $USER_HOME/.kube
+usermod -a -G microk8s $USERNAME
+mkdir -p $USER_HOME/.kube
+chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 
 microk8s enable dns cert-manager ingress hostpath-storage
 microk8s enable community
@@ -37,13 +37,13 @@ echo "microk8s kubectl get nodes"
 echo "microk8s kubectl get services"
 
 # Install net-tools package for commands like netstat
-sudo apt-get update
-sudo apt-get install -y net-tools
+apt-get update
+apt-get install -y net-tools
 
 # Install build-essential before Homebrew
 echo "Installing build-essential..."
-sudo apt-get update
-sudo apt-get install -y build-essential
+apt-get update
+apt-get install -y build-essential
 
 # Install Homebrew and all pre-requisites as the specified user
 echo "Installing Homebrew..."
@@ -85,10 +85,10 @@ sudo -u $USERNAME bash -c "microk8s config > $USER_HOME/.kube/config"
 
 # Give the user appropriate permissions for microk8s
 echo "Adding user to microk8s group..."
-sudo chown -R $USERNAME:$USERNAME $USER_HOME/.kube
+chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 
 # Install clipboard utilities to copy logs from k9s
-sudo apt update
-sudo apt-get install -y xclip
+apt update
+apt-get install -y xclip
 
-echo "Setup complete."
+echo "Setup complete. Please restart your terminal or run 'source $USER_HOME/.bashrc' to apply the changes."
