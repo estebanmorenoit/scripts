@@ -5,7 +5,7 @@ read -p "Enter your username: " USERNAME
 USER_HOME="/home/$USERNAME"
 
 # Ensure the script is executed with root privileges
-if [ "$(id -u)" -ne 0; then
+if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run as root."
     exit 1
 fi
@@ -48,16 +48,21 @@ sudo apt-get install -y build-essential
 # Install Homebrew and all pre-requisites as the specified user
 echo "Installing Homebrew..."
 sudo -u $USERNAME /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-sudo -u $USERNAME bash -c 'echo "eval \$($(brew --prefix)/bin/brew shellenv)" >> $HOME/.bashrc'
-sudo -u $USERNAME bash -c 'eval $($(brew --prefix)/bin/brew shellenv)'
+
+# Use the full path to the Homebrew binary
+HOMEBREW_PATH="/home/linuxbrew/.linuxbrew/bin/brew"
 
 # Add Homebrew to PATH for the specified user
-sudo -u $USERNAME bash -c 'echo "eval \$($(brew --prefix)/bin/brew shellenv)" >> $HOME/.profile'
-sudo -u $USERNAME bash -c 'eval $($(brew --prefix)/bin/brew shellenv)'
+sudo -u $USERNAME bash -c "echo 'eval \$($HOMEBREW_PATH shellenv)' >> /home/$USERNAME/.bashrc"
+sudo -u $USERNAME bash -c "eval \$($HOMEBREW_PATH shellenv)"
+
+# Install Homebrew's dependencies and GCC
+echo "Installing Homebrew dependencies and GCC..."
+sudo -u $USERNAME bash -c "$HOMEBREW_PATH install gcc"
 
 # Install k9s using Homebrew as the specified user
 echo "Installing k9s..."
-sudo -u $USERNAME bash -c 'brew install derailed/k9s/k9s'
+sudo -u $USERNAME bash -c "$HOMEBREW_PATH install derailed/k9s/k9s"
 
 # Add k9s config to enable exec, edit, etc commands
 sudo -u $USERNAME bash -c "mkdir -p $USER_HOME/.k9s"
