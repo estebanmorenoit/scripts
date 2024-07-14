@@ -5,7 +5,7 @@ USERNAME="esteban"
 USER_HOME="/home/$USERNAME"
 
 # Ensure the script is executed with root privileges
-if [ "$(id -u)" -ne 0; then
+if [ "$(id -u)" -ne 0 ]; then
     echo "This script must be run as root."
     exit 1
 fi
@@ -18,15 +18,15 @@ usermod -a -G microk8s $USERNAME
 mkdir -p $USER_HOME/.kube
 chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 
-microk8s enable dns cert-manager ingress hostpath-storage
-microk8s enable community
-microk8s enable observability
+microk8s enable dns cert-manager ingress hostpath-storage observability argocd
 
 echo "Checking MicroK8s status..."
 microk8s status --wait-ready
 
 echo "Setting up kubectl alias..."
 echo "alias kubectl='microk8s kubectl'" >> $USER_HOME/.bash_aliases
+sudo snap alias microk8s.kubectl kubectl
+
 
 echo "Setting up helm alias..."
 echo "alias helm='microk8s helm3'" >> $USER_HOME/.bash_aliases
