@@ -10,27 +10,33 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+# Install MicroK8s from Snap
 echo "Installing MicroK8s from Snap..."
 snap install microk8s --classic
 
+# Add the user to the microk8s group
 echo "Adding $USERNAME to the microk8s group..."
 usermod -a -G microk8s $USERNAME
 mkdir -p $USER_HOME/.kube
 chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 
+# Enable necessary MicroK8s add-ons
 microk8s enable dns cert-manager ingress hostpath-storage observability argocd
 
+# Wait for MicroK8s to be ready
 echo "Checking MicroK8s status..."
 microk8s status --wait-ready
 
+# Set up kubectl alias
 echo "Setting up kubectl alias..."
 echo "alias kubectl='microk8s kubectl'" >> $USER_HOME/.bash_aliases
 sudo snap alias microk8s.kubectl kubectl
 
-
+# Set up helm alias
 echo "Setting up helm alias..."
 echo "alias helm='microk8s helm3'" >> $USER_HOME/.bash_aliases
 
+# Provide user with instructions to apply alias
 echo "To apply the alias, either restart your terminal or source your .bash_aliases file."
 echo "You can now check the nodes and services in your Kubernetes setup:"
 echo "microk8s kubectl get nodes"
@@ -91,4 +97,5 @@ chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 apt update
 apt-get install -y xclip
 
+# Completion message
 echo "Setup complete. Please restart your terminal or run 'source $USER_HOME/.bashrc' to apply the changes."
