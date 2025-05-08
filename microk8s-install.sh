@@ -21,7 +21,7 @@ mkdir -p $USER_HOME/.kube
 chown -R $USERNAME:$USERNAME $USER_HOME/.kube
 
 # Enable necessary MicroK8s add-ons
-microk8s enable dns cert-manager ingress hostpath-storage observability
+microk8s enable dns ingress hostpath-storage 
 
 # Wait for MicroK8s to be ready
 echo "Checking MicroK8s status..."
